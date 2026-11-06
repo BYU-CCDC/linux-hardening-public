@@ -1,0 +1,1040 @@
+#!/usr/bin/env bash
+# @module_name: fastfw
+# @mod-imports:
+
+if [ -n "$ZSH_VERSION" ]; then
+    EXEC_SHELL="zsh"
+    IFS='.' read -A EXEC_SHELL_VERSION <<< "$ZSH_VERSION"
+elif [ -n "$KSH_VERSION" ]; then
+    EXEC_SHELL="ksh"
+    __exec_shell_version="${.sh.version##*/}"
+    IFS='.' read -a EXEC_SHELL_VERSION <<< "${__exec_shell_version%% *}"
+else
+    EXEC_SHELL="bash"
+    EXEC_SHELL_VERSION=("${BASH_VERSINFO[0]}" "${BASH_VERSINFO[1]}" "${BASH_VERSINFO[2]}")
+fi
+# replace(source: Text, search: Text, replace: Text)
+replace__0_v0() {
+    local source_77="${1}"
+    local search_78="${2}"
+    local replace_79="${3}"
+    local result_80=""
+    left_comp=("${EXEC_SHELL_VERSION[@]}")
+    right_comp=(4 3)
+    local comp
+    comp="$(
+        # Compare if left array >= right array
+        len_comp="$( (( "${#left_comp[@]}" < "${#right_comp[@]}" )) && echo "${#left_comp[@]}"|| echo "${#right_comp[@]}")"
+        for (( i=0; i<len_comp; i++ )); do
+            left="${left_comp[i]?"Index out of bounds (at unknown)"}"
+            right="${right_comp[i]?"Index out of bounds (at unknown)"}"
+            if (( "${left}" > "${right}" )); then
+                echo 1
+                exit
+            elif (( "${left}" < "${right}" )); then
+                echo 0
+                exit
+            fi
+        done
+        (( "${#left_comp[@]}" == "${#right_comp[@]}" || "${#left_comp[@]}" > "${#right_comp[@]}" )) && echo 1 || echo 0
+)"
+    if [ "$(( $([ "_${EXEC_SHELL}" != "_ksh" ]; echo $?) || $(( $([ "_${EXEC_SHELL}" != "_bash" ]; echo $?) && comp )) ))" != 0 ]; then
+        result_80="${source_77//"${search_78}"/"${replace_79}"}"
+        __status=$?
+    else
+        result_80="${source_77//"${search_78}"/${replace_79}}"
+        __status=$?
+    fi
+    ret_replace0_v0="${result_80}"
+    return 0
+}
+
+__SED_VERSION_UNKNOWN_0=0
+__SED_VERSION_GNU_1=1
+__SED_VERSION_BUSYBOX_2=2
+# sed_version()
+sed_version__2_v0() {
+    re='Copyright.+Free Software Foundation'; [[ $(sed --version 2>/dev/null) =~ $re ]]
+    __status=$?
+    if [ "$(( __status == 0 ))" != 0 ]; then
+        ret_sed_version2_v0="${__SED_VERSION_GNU_1}"
+        return 0
+    fi
+    re='BusyBox'; [[ $(sed --help 2>&1) =~ $re ]]
+    __status=$?
+    if [ "$(( __status == 0 ))" != 0 ]; then
+        ret_sed_version2_v0="${__SED_VERSION_BUSYBOX_2}"
+        return 0
+    fi
+    ret_sed_version2_v0="${__SED_VERSION_UNKNOWN_0}"
+    return 0
+}
+
+# replace_regex(source: Text, search: Text, replace_text: Text, extended: Bool)
+replace_regex__3_v0() {
+    local source_72="${1}"
+    local search_73="${2}"
+    local replace_text_74="${3}"
+    local extended_75="${4}"
+    sed_version__2_v0 
+    local sed_version_76="${ret_sed_version2_v0}"
+    replace__0_v0 "${search_73}" "/" "\\/"
+    search_73="${ret_replace0_v0}"
+    replace__0_v0 "${replace_text_74}" "/" "\\/"
+    replace_text_74="${ret_replace0_v0}"
+    if [ "$(( $(( sed_version_76 == __SED_VERSION_GNU_1 )) || $(( sed_version_76 == __SED_VERSION_BUSYBOX_2 )) ))" != 0 ]; then
+        replace__0_v0 "${search_73}" "\\b" "\\\\b"
+        search_73="${ret_replace0_v0}"
+    fi
+    if [ "${extended_75}" != 0 ]; then
+        if [ "$(( sed_version_76 == __SED_VERSION_GNU_1 ))" != 0 ]; then
+            local command_1
+            command_1="$(sed -r -e "s/${search_73}/${replace_text_74}/g" <<<"${source_72}")"
+            __status=$?
+            ret_replace_regex3_v0="${command_1}"
+            return 0
+        else
+            local command_2
+            command_2="$(sed -E -e "s/${search_73}/${replace_text_74}/g" <<<"${source_72}")"
+            __status=$?
+            ret_replace_regex3_v0="${command_2}"
+            return 0
+        fi
+    else
+        if [ "$(( $(( sed_version_76 == __SED_VERSION_GNU_1 )) || $(( sed_version_76 == __SED_VERSION_BUSYBOX_2 )) ))" != 0 ]; then
+            replace__0_v0 "${search_73}" "\\|" "|"
+            search_73="${ret_replace0_v0}"
+        fi
+        local command_3
+        command_3="$(sed -e "s/${search_73}/${replace_text_74}/g" <<<"${source_72}")"
+        __status=$?
+        ret_replace_regex3_v0="${command_3}"
+        return 0
+    fi
+}
+
+# split(text: Text, delimiter: Text)
+split__4_v0() {
+    local text_39="${1}"
+    local delimiter_40="${2}"
+    local result_41=()
+    if [ "$([ "_${EXEC_SHELL}" != "_zsh" ]; echo $?)" != 0 ]; then
+        IFS="${delimiter_40}" read -rd '' -A result_41 < <(printf %s "$text_39")
+        __status=$?
+    elif [ "$([ "_${EXEC_SHELL}" != "_ksh" ]; echo $?)" != 0 ]; then
+        if [ "$([ "_${delimiter_40}" != "_
+" ]; echo $?)" != 0 ]; then
+            while read -r -d $'\n'; do result_41+=("$REPLY"); done < <(echo "$text_39")
+            __status=$?
+        else
+            IFS="${delimiter_40}" read -rd '' -a result_41 < <(printf %s "$text_39")
+            __status=$?
+        fi
+    elif [ "$([ "_${EXEC_SHELL}" != "_bash" ]; echo $?)" != 0 ]; then
+        IFS="${delimiter_40}" read -rd '' -a result_41 < <(printf %s "$text_39")
+        __status=$?
+    fi
+    ret_split4_v0=("${result_41[@]}")
+    return 0
+}
+
+# split_lines(text: Text)
+split_lines__5_v0() {
+    local text_38="${1}"
+    split__4_v0 "${text_38}" "
+"
+    ret_split_lines5_v0=("${ret_split4_v0[@]}")
+    return 0
+}
+
+# split_words(text: Text)
+split_words__6_v0() {
+    local text_141="${1}"
+    split__4_v0 "${text_141}" " "
+    ret_split_words6_v0=("${ret_split4_v0[@]}")
+    return 0
+}
+
+# trim(text: Text)
+trim__10_v0() {
+    local text_21="${1}"
+    local result_22=""
+    result_22="${text_21#${text_21%%[![:space:]]*}}"
+    __status=$?
+    result_22="${result_22%${result_22##*[![:space:]]}}"
+    __status=$?
+    ret_trim10_v0="${result_22}"
+    return 0
+}
+
+# lowercase(text: Text)
+lowercase__11_v0() {
+    local text_23="${1}"
+    left_comp=("${EXEC_SHELL_VERSION[@]}")
+    right_comp=(4 3)
+    local comp
+    comp="$(
+        # Compare if left array < right array
+        len_comp="$( (( "${#left_comp[@]}" < "${#right_comp[@]}" )) && echo "${#left_comp[@]}"|| echo "${#right_comp[@]}")"
+        for (( i=0; i<len_comp; i++ )); do
+            left="${left_comp[i]?"Index out of bounds (at unknown)"}"
+            right="${right_comp[i]?"Index out of bounds (at unknown)"}"
+            if (( "${left}" < "${right}" )); then
+                echo 1
+                exit
+            elif (( "${left}" > "${right}" )); then
+                echo 0
+                exit
+            fi
+        done
+        (( "${#left_comp[@]}" < "${#right_comp[@]}" )) && echo 1 || echo 0
+)"
+    if [ "$(( $([ "_${EXEC_SHELL}" != "_bash" ]; echo $?) && comp ))" != 0 ]; then
+        text_23="$(printf '%s' "${text_23}" | tr '[:upper:]' '[:lower:]')"
+        __status=$?
+    else
+        typeset -l text_23
+            text_23="${text_23}"
+        __status=$?
+    fi
+    ret_lowercase11_v0="${text_23}"
+    return 0
+}
+
+# parse_int(text: Text)
+parse_int__13_v0() {
+    local text_153="${1}"
+    [ -n "${text_153}" ] && [ "${text_153}" -eq "${text_153}" ] 2>/dev/null
+    __status=$?
+    if [ "${__status}" != 0 ]; then
+        ret_parse_int13_v0=''
+        return "${__status}"
+    fi
+    ret_parse_int13_v0="${text_153}"
+    return 0
+}
+
+# match_regex(source: Text, search: Text, extended: Bool)
+match_regex__19_v0() {
+    local source_146="${1}"
+    local search_147="${2}"
+    local extended_148="${3}"
+    sed_version__2_v0 
+    local sed_version_149="${ret_sed_version2_v0}"
+    replace__0_v0 "${search_147}" "/" "\\/"
+    search_147="${ret_replace0_v0}"
+    local output_150=""
+    if [ "$(( $(( sed_version_149 == __SED_VERSION_GNU_1 )) || $(( sed_version_149 == __SED_VERSION_BUSYBOX_2 )) ))" != 0 ]; then
+        replace__0_v0 "${search_147}" "\\b" "\\\\b"
+        search_147="${ret_replace0_v0}"
+    fi
+    if [ "${extended_148}" != 0 ]; then
+        if [ "$(( sed_version_149 == __SED_VERSION_GNU_1 ))" != 0 ]; then
+            replace__0_v0 "${search_147}" "\\b" "\\b"
+            search_147="${ret_replace0_v0}"
+            local command_6
+            command_6="$(sed -r -ne "/${search_147}/p" <<<"${source_146}")"
+            __status=$?
+            output_150="${command_6}"
+        else
+            local command_7
+            command_7="$(sed -E -ne "/${search_147}/p" <<<"${source_146}")"
+            __status=$?
+            output_150="${command_7}"
+        fi
+    else
+        if [ "$(( $(( sed_version_149 == __SED_VERSION_GNU_1 )) || $(( sed_version_149 == __SED_VERSION_BUSYBOX_2 )) ))" != 0 ]; then
+            replace__0_v0 "${search_147}" "\\|" "|"
+            search_147="${ret_replace0_v0}"
+        fi
+        local command_8
+        command_8="$(sed -ne "/${search_147}/p" <<<"${source_146}")"
+        __status=$?
+        output_150="${command_8}"
+    fi
+    if [ "$([ "_${output_150}" == "_" ]; echo $?)" != 0 ]; then
+        ret_match_regex19_v0=1
+        return 0
+    fi
+    ret_match_regex19_v0=0
+    return 0
+}
+
+# starts_with(text: Text, prefix: Text)
+starts_with__22_v0() {
+    local text_45="${1}"
+    local prefix_46="${2}"
+    [[ "${text_45}" == "${prefix_46}"* ]]
+    __status=$?
+    ret_starts_with22_v0="$(( __status == 0 ))"
+    return 0
+}
+
+# fw_prompt(message: Text)
+fw_prompt__46_v0() {
+    local message_20="${1}"
+    printf '%s\n' "${message_20}"
+    local command_9
+    command_9="$(IFS= read -r answer && printf '%s' "$answer")"
+    __status=$?
+    if [ "${__status}" != 0 ]; then
+        ret_fw_prompt46_v0=''
+        return "${__status}"
+    fi
+    ret_fw_prompt46_v0="${command_9}"
+    return 0
+}
+
+# fw_yesno(message: Text, default_yes: Bool)
+fw_yesno__47_v0() {
+    local message_18="${1}"
+    local default_yes_19="${2}"
+    while :
+    do
+        fw_prompt__46_v0 "${message_18}"
+        __status=$?
+        if [ "${__status}" != 0 ]; then
+            ret_fw_yesno47_v0=''
+            return "${__status}"
+        fi
+        local ret_fw_prompt46_v0__12_39="${ret_fw_prompt46_v0}"
+        trim__10_v0 "${ret_fw_prompt46_v0__12_39}"
+        local ret_trim10_v0__12_34="${ret_trim10_v0}"
+        lowercase__11_v0 "${ret_trim10_v0__12_34}"
+        local answer_24="${ret_lowercase11_v0}"
+        if [ "$([ "_${answer_24}" != "_" ]; echo $?)" != 0 ]; then
+            ret_fw_yesno47_v0="${default_yes_19}"
+            return 0
+        fi
+        if [ "$(( $([ "_${answer_24}" != "_y" ]; echo $?) || $([ "_${answer_24}" != "_yes" ]; echo $?) ))" != 0 ]; then
+            ret_fw_yesno47_v0=1
+            return 0
+        fi
+        if [ "$(( $([ "_${answer_24}" != "_n" ]; echo $?) || $([ "_${answer_24}" != "_no" ]; echo $?) ))" != 0 ]; then
+            ret_fw_yesno47_v0=0
+            return 0
+        fi
+        echo "Please answer yes or no."
+    done
+}
+
+# fw_address(address: Text)
+fw_address__48_v0() {
+    local address_145="${1}"
+    match_regex__19_v0 "${address_145}" "^[0-9]+[.][0-9]+[.][0-9]+[.][0-9]+(/[0-9]+)?\$" 1
+    local ret_match_regex19_v0__22_12="${ret_match_regex19_v0}"
+    if [ "$(( ! ret_match_regex19_v0__22_12 ))" != 0 ]; then
+        ret_fw_address48_v0=0
+        return 0
+    fi
+    split__4_v0 "${address_145}" "/"
+    local parts_151=("${ret_split4_v0[@]}")
+    split__4_v0 "${parts_151[0]?"Index out of bounds (at src/modules/../utils/firewall.ab:24:30)"}" "."
+    local ret_split4_v0__24_18=("${ret_split4_v0[@]}")
+    for octet_152 in "${ret_split4_v0__24_18[@]}"; do
+        match_regex__19_v0 "${octet_152}" "^(0|[1-9][0-9]{0,2})\$" 1
+        local ret_match_regex19_v0__25_16="${ret_match_regex19_v0}"
+        if [ "$(( ! ret_match_regex19_v0__25_16 ))" != 0 ]; then
+            ret_fw_address48_v0=0
+            return 0
+        fi
+        parse_int__13_v0 "${octet_152}"
+        __status=$?
+        if [ "${__status}" != 0 ]; then
+            ret_fw_address48_v0=0
+            return 0
+        fi
+        local value_154="${ret_parse_int13_v0}"
+        if [ "$(( $(( value_154 < 0 )) || $(( value_154 > 255 )) ))" != 0 ]; then
+            ret_fw_address48_v0=0
+            return 0
+        fi
+    done
+    local __length_12=("${parts_151[@]}")
+    if [ "$(( ${#__length_12[@]} == 2 ))" != 0 ]; then
+        match_regex__19_v0 "${parts_151[1]?"Index out of bounds (at src/modules/../utils/firewall.ab:30:34)"}" "^(0|[1-9][0-9]?)\$" 1
+        local ret_match_regex19_v0__30_16="${ret_match_regex19_v0}"
+        if [ "$(( ! ret_match_regex19_v0__30_16 ))" != 0 ]; then
+            ret_fw_address48_v0=0
+            return 0
+        fi
+        parse_int__13_v0 "${parts_151[1]?"Index out of bounds (at src/modules/../utils/firewall.ab:31:40)"}"
+        __status=$?
+        if [ "${__status}" != 0 ]; then
+            ret_fw_address48_v0=0
+            return 0
+        fi
+        local prefix_155="${ret_parse_int13_v0}"
+        if [ "$(( $(( prefix_155 < 0 )) || $(( prefix_155 > 32 )) ))" != 0 ]; then
+            ret_fw_address48_v0=0
+            return 0
+        fi
+    fi
+    ret_fw_address48_v0=1
+    return 0
+}
+
+# fw_addresses(message: Text, required: Bool)
+fw_addresses__49_v0() {
+    local message_139="${1}"
+    local required_140="${2}"
+    while :
+    do
+        fw_prompt__46_v0 "${message_139}"
+        __status=$?
+        if [ "${__status}" != 0 ]; then
+            ret_fw_addresses49_v0=()
+            return "${__status}"
+        fi
+        local ret_fw_prompt46_v0__39_39="${ret_fw_prompt46_v0}"
+        split_words__6_v0 "${ret_fw_prompt46_v0__39_39}"
+        local addresses_142=("${ret_split_words6_v0[@]}")
+        local valid_143=1
+        local __length_13=("${addresses_142[@]}")
+        if [ "$(( required_140 && $(( ${#__length_13[@]} == 0 )) ))" != 0 ]; then
+            echo "At least one IPv4 address is required."
+            valid_143=0
+        fi
+        for address_144 in "${addresses_142[@]}"; do
+            fw_address__48_v0 "${address_144}"
+            local ret_fw_address48_v0__46_20="${ret_fw_address48_v0}"
+            if [ "$(( ! ret_fw_address48_v0__46_20 ))" != 0 ]; then
+                echo "Invalid IPv4 address/subnet: ${address_144}. Use decimal octets 0-255 and a prefix 0-32, without leading zeros."
+                valid_143=0
+            fi
+        done
+        if [ "${valid_143}" != 0 ]; then
+            ret_fw_addresses49_v0=("${addresses_142[@]}")
+            return 0
+        fi
+        echo "Please enter the address list again."
+    done
+}
+
+# fw_port_number(port: Text)
+fw_port_number__50_v0() {
+    local port_247="${1}"
+    match_regex__19_v0 "${port_247}" "^[0-9]{1,5}\$" 1
+    local ret_match_regex19_v0__58_12="${ret_match_regex19_v0}"
+    if [ "$(( ! ret_match_regex19_v0__58_12 ))" != 0 ]; then
+        ret_fw_port_number50_v0=''
+        return 1
+    fi
+    replace_regex__3_v0 "${port_247}" "^0+" "" 1
+    local decimal_248="${ret_replace_regex3_v0}"
+    if [ "$([ "_${decimal_248}" != "_" ]; echo $?)" != 0 ]; then
+        decimal_248="0"
+    fi
+    parse_int__13_v0 "${decimal_248}"
+    __status=$?
+    if [ "${__status}" != 0 ]; then
+        ret_fw_port_number50_v0=''
+        return "${__status}"
+    fi
+    local value_249="${ret_parse_int13_v0}"
+    if [ "$(( value_249 > 65535 ))" != 0 ]; then
+        ret_fw_port_number50_v0=''
+        return 1
+    fi
+    ret_fw_port_number50_v0="${value_249}"
+    return 0
+}
+
+# fw_port_value(port: Text, proto: Text)
+fw_port_value__51_v0() {
+    local port_245="${1}"
+    local proto_246="${2}"
+    match_regex__19_v0 "${port_245}" "^[0-9]+\$" 1
+    local ret_match_regex19_v0__68_8="${ret_match_regex19_v0}"
+    if [ "${ret_match_regex19_v0__68_8}" != 0 ]; then
+        fw_port_number__50_v0 "${port_245}"
+        __status=$?
+        if [ "${__status}" != 0 ]; then
+            ret_fw_port_value51_v0=''
+            return "${__status}"
+        fi
+        ret_fw_port_value51_v0="${ret_fw_port_number50_v0}"
+        return 0
+    fi
+    match_regex__19_v0 "${port_245}" "^[a-zA-Z][a-zA-Z0-9_-]*\$" 1
+    local ret_match_regex19_v0__69_12="${ret_match_regex19_v0}"
+    if [ "$(( ! ret_match_regex19_v0__69_12 ))" != 0 ]; then
+        ret_fw_port_value51_v0=''
+        return 1
+    fi
+    local command_16
+    command_16="$(getent services "${port_245}/${proto_246}")"
+    __status=$?
+    if [ "${__status}" != 0 ]; then
+        ret_fw_port_value51_v0=''
+        return "${__status}"
+    fi
+    local entry_250="${command_16}"
+    split_words__6_v0 "${entry_250}"
+    local fields_251=("${ret_split_words6_v0[@]}")
+    local __length_17=("${fields_251[@]}")
+    if [ "$(( ${#__length_17[@]} < 2 ))" != 0 ]; then
+        ret_fw_port_value51_v0=''
+        return 1
+    fi
+    split__4_v0 "${fields_251[1]?"Index out of bounds (at src/modules/../utils/firewall.ab:73:34)"}" "/"
+    local service_252=("${ret_split4_v0[@]}")
+    local __length_18=("${service_252[@]}")
+    if [ "$(( ${#__length_18[@]} != 2 ))" != 0 ]; then
+        ret_fw_port_value51_v0=''
+        return 1
+    fi
+    if [ "$([ "_${service_252[1]?"Index out of bounds (at src/modules/../utils/firewall.ab:75:16)"}" == "_${proto_246}" ]; echo $?)" != 0 ]; then
+        ret_fw_port_value51_v0=''
+        return 1
+    fi
+    fw_port_number__50_v0 "${service_252[0]?"Index out of bounds (at src/modules/../utils/firewall.ab:76:35)"}"
+    __status=$?
+    if [ "${__status}" != 0 ]; then
+        ret_fw_port_value51_v0=''
+        return "${__status}"
+    fi
+    ret_fw_port_value51_v0="${ret_fw_port_number50_v0}"
+    return 0
+}
+
+# fw_port_valid(port: Text, proto: Text)
+fw_port_valid__52_v0() {
+    local port_242="${1}"
+    local proto_243="${2}"
+    if [ "$(( $([ "_${proto_243}" == "_tcp" ]; echo $?) && $([ "_${proto_243}" == "_udp" ]; echo $?) ))" != 0 ]; then
+        ret_fw_port_valid52_v0=0
+        return 0
+    fi
+    match_regex__19_v0 "${port_242}" "^[a-zA-Z0-9][a-zA-Z0-9_-]*(:[a-zA-Z0-9][a-zA-Z0-9_-]*)?\$" 1
+    local ret_match_regex19_v0__82_12="${ret_match_regex19_v0}"
+    if [ "$(( ! ret_match_regex19_v0__82_12 ))" != 0 ]; then
+        ret_fw_port_valid52_v0=0
+        return 0
+    fi
+    split__4_v0 "${port_242}" ":"
+    local endpoints_244=("${ret_split4_v0[@]}")
+    fw_port_value__51_v0 "${endpoints_244[0]?"Index out of bounds (at src/modules/../utils/firewall.ab:84:43)"}" "${proto_243}"
+    __status=$?
+    if [ "${__status}" != 0 ]; then
+        ret_fw_port_valid52_v0=0
+        return 0
+    fi
+    local first_253="${ret_fw_port_value51_v0}"
+    local __length_19=("${endpoints_244[@]}")
+    if [ "$(( ${#__length_19[@]} == 2 ))" != 0 ]; then
+        fw_port_value__51_v0 "${endpoints_244[1]?"Index out of bounds (at src/modules/../utils/firewall.ab:86:46)"}" "${proto_243}"
+        __status=$?
+        if [ "${__status}" != 0 ]; then
+            ret_fw_port_valid52_v0=0
+            return 0
+        fi
+        local last_254="${ret_fw_port_value51_v0}"
+        if [ "$(( first_253 > last_254 ))" != 0 ]; then
+            ret_fw_port_valid52_v0=0
+            return 0
+        fi
+    fi
+    ret_fw_port_valid52_v0=1
+    return 0
+}
+
+# fw_port_rule(chain: Text, proto: Text, port: Text, address: Text, label: Text)
+fw_port_rule__53_v0() {
+    local chain_237="${1}"
+    local proto_238="${2}"
+    local port_239="${3}"
+    local address_240="${4}"
+    local label_241="${5}"
+    if [ "$(( $([ "_${chain_237}" == "_INPUT" ]; echo $?) && $([ "_${chain_237}" == "_OUTPUT" ]; echo $?) ))" != 0 ]; then
+        ret_fw_port_rule53_v0=''
+        return 1
+    fi
+    if [ "$(( $([ "_${proto_238}" == "_tcp" ]; echo $?) && $([ "_${proto_238}" == "_udp" ]; echo $?) ))" != 0 ]; then
+        ret_fw_port_rule53_v0=''
+        return 1
+    fi
+    fw_port_valid__52_v0 "${port_239}" "${proto_238}"
+    local ret_fw_port_valid52_v0__95_12="${ret_fw_port_valid52_v0}"
+    if [ "$(( ! ret_fw_port_valid52_v0__95_12 ))" != 0 ]; then
+        ret_fw_port_rule53_v0=''
+        return 1
+    fi
+    local normalized_255=""
+    split__4_v0 "${port_239}" ":"
+    local ret_split4_v0__97_21=("${ret_split4_v0[@]}")
+    for endpoint_256 in "${ret_split4_v0__97_21[@]}"; do
+        if [ "$([ "_${normalized_255}" == "_" ]; echo $?)" != 0 ]; then
+            normalized_255+=":"
+        fi
+        match_regex__19_v0 "${endpoint_256}" "^[0-9]+\$" 1
+        local ret_match_regex19_v0__99_12="${ret_match_regex19_v0}"
+        if [ "${ret_match_regex19_v0__99_12}" != 0 ]; then
+            fw_port_number__50_v0 "${endpoint_256}"
+            __status=$?
+            if [ "${__status}" != 0 ]; then
+                ret_fw_port_rule53_v0=''
+                return "${__status}"
+            fi
+            local number_257="${ret_fw_port_number50_v0}"
+            normalized_255+="${number_257}"
+        else
+            normalized_255+="${endpoint_256}"
+        fi
+    done
+    local scope_258=""
+    if [ "$([ "_${address_240}" == "_" ]; echo $?)" != 0 ]; then
+        fw_address__48_v0 "${address_240}"
+        local ret_fw_address48_v0__106_16="${ret_fw_address48_v0}"
+        if [ "$(( ! ret_fw_address48_v0__106_16 ))" != 0 ]; then
+            ret_fw_port_rule53_v0=''
+            return 1
+        fi
+        if [ "$([ "_${chain_237}" != "_INPUT" ]; echo $?)" != 0 ]; then
+            scope_258=" -s ""${address_240}"
+        else
+            scope_258=" -d ""${address_240}"
+        fi
+    fi
+    match_regex__19_v0 "${label_241}" "^[a-zA-Z0-9 /_-]+\$" 1
+    local ret_match_regex19_v0__110_12="${ret_match_regex19_v0}"
+    if [ "$(( ! ret_match_regex19_v0__110_12 ))" != 0 ]; then
+        ret_fw_port_rule53_v0=''
+        return 1
+    fi
+    ret_fw_port_rule53_v0="-A ${chain_237} -p ${proto_238} --dport ${normalized_255}${scope_258} -m comment --comment \"${label_241}\" -j ACCEPT
+"
+    return 0
+}
+
+# fw_ports(chain: Text, proto: Text, address: Text)
+fw_ports__54_v0() {
+    local chain_274="${1}"
+    local proto_275="${2}"
+    local address_276="${3}"
+    while :
+    do
+        local rules_277=""
+        local valid_278=1
+        fw_prompt__46_v0 "Space-separated ${chain_274} ${proto_275} ports/services (blank for none), peer '${address_276}':"
+        __status=$?
+        if [ "${__status}" != 0 ]; then
+            ret_fw_ports54_v0=''
+            return "${__status}"
+        fi
+        local ret_fw_prompt46_v0__118_35="${ret_fw_prompt46_v0}"
+        split_words__6_v0 "${ret_fw_prompt46_v0__118_35}"
+        local ports_279=("${ret_split_words6_v0[@]}")
+        for port_280 in "${ports_279[@]}"; do
+            fw_port_valid__52_v0 "${port_280}" "${proto_275}"
+            local ret_fw_port_valid52_v0__120_16="${ret_fw_port_valid52_v0}"
+            if [ "${ret_fw_port_valid52_v0__120_16}" != 0 ]; then
+                fw_port_rule__53_v0 "${chain_274}" "${proto_275}" "${port_280}" "${address_276}" "custom"
+                __status=$?
+                if [ "${__status}" != 0 ]; then
+                    ret_fw_ports54_v0=''
+                    return "${__status}"
+                fi
+                rules_277+="${ret_fw_port_rule53_v0}"
+            else
+                echo "Invalid ${proto_275} port/service or range: ${port_280}. Use ports 0-65535, known ${proto_275} service names, or ordered start:end ranges."
+                valid_278=0
+            fi
+        done
+        if [ "${valid_278}" != 0 ]; then
+            ret_fw_ports54_v0="${rules_277}"
+            return 0
+        fi
+        echo "Please enter the full port list again."
+    done
+}
+
+command_25="$(id -u)"
+__status=$?
+if [ "${__status}" != 0 ]; then
+    exit "${__status}"
+fi
+uid_3="${command_25}"
+if [ "$([ "_${uid_3}" == "_0" ]; echo $?)" != 0 ]; then
+    echo "Please run with sudo or as root."
+    exit 1
+fi
+array_28=("iptables-save" "iptables-restore" "iptables-apply" "getent" "sysctl")
+for tool_4 in "${array_28[@]}"; do
+    command -v ${tool_4} > /dev/null
+    __status=$?
+    if [ "${__status}" != 0 ]; then
+        echo "Required command missing: ${tool_4}"
+        exit 1
+    fi
+done
+ufw_active_5=0
+firewalld_active_6=0
+command -v ufw > /dev/null && ufw status | grep -q '^Status: active' 2>/dev/null
+__status=$?
+if [ "${__status}" = 0 ]; then
+    ufw_active_5=1
+fi
+command -v systemctl > /dev/null && systemctl is-active --quiet firewalld 2>/dev/null
+__status=$?
+if [ "${__status}" = 0 ]; then
+    firewalld_active_6=1
+fi
+if [ "$(( ufw_active_5 || firewalld_active_6 ))" != 0 ]; then
+    fw_yesno__47_v0 "Disable active UFW/firewalld? This is not reverted if rule application fails. (y/N)" 0
+    __status=$?
+    if [ "${__status}" != 0 ]; then
+        exit "${__status}"
+    fi
+    ret_fw_yesno47_v0__33_16="${ret_fw_yesno47_v0}"
+    if [ "$(( ! ret_fw_yesno47_v0__33_16 ))" != 0 ]; then
+        echo "Aborted: active firewall managers must be disabled before continuing."
+        exit 1
+    fi
+    if [ "${ufw_active_5}" != 0 ]; then
+        ufw disable
+        __status=$?
+        if [ "${__status}" != 0 ]; then
+        code_25="${__status}"
+            echo "Could not disable UFW. Aborting; check its status before retrying."
+            exit "${code_25}"
+        fi
+        ufw status | grep -q '^Status: inactive' 2>/dev/null
+        __status=$?
+        if [ "${__status}" != 0 ]; then
+            echo "Could not verify that UFW is inactive. Aborting."
+            exit 1
+        fi
+    fi
+    if [ "${firewalld_active_6}" != 0 ]; then
+        systemctl disable --now firewalld
+        __status=$?
+        if [ "${__status}" != 0 ]; then
+        code_26="${__status}"
+            echo "Could not stop and disable firewalld. Aborting; check its status before retrying."
+            exit "${code_26}"
+        fi
+        systemctl is-active --quiet firewalld 2>/dev/null
+        __status=$?
+        if [ "${__status}" = 0 ]; then
+            echo "firewalld is still active. Aborting."
+            exit 1
+        fi
+    fi
+fi
+echo "Configuring IPv4 only."
+command_29="$(iptables-save -t filter)"
+__status=$?
+if [ "${__status}" != 0 ]; then
+    exit "${__status}"
+fi
+original_27="${command_29}"
+declarations_28="*filter
+"
+existing_29=""
+chain_count_30=0
+split_lines__5_v0 "${original_27}"
+ret_split_lines5_v0__67_17=("${ret_split_lines5_v0[@]}")
+for line_42 in "${ret_split_lines5_v0__67_17[@]}"; do
+    starts_with__22_v0 "${line_42}" ":"
+    ret_starts_with22_v0__68_12="${ret_starts_with22_v0}"
+    if [ "${ret_starts_with22_v0__68_12}" != 0 ]; then
+        replace_regex__3_v0 "${line_42}" "^:(INPUT|OUTPUT|FORWARD) [A-Z]+" ":\\1 DROP" 1
+        ret_replace_regex3_v0__69_29="${ret_replace_regex3_v0}"
+        declarations_28+="${ret_replace_regex3_v0__69_29}""
+"
+        chain_count_30="$(( chain_count_30 + 1 ))"
+    fi
+    starts_with__22_v0 "${line_42}" "-A "
+    ret_starts_with22_v0__72_12="${ret_starts_with22_v0}"
+    if [ "${ret_starts_with22_v0__72_12}" != 0 ]; then
+        existing_29+="${line_42}""
+"
+    fi
+done
+if [ "$(( $([ "_${existing_29}" == "_" ]; echo $?) || $(( chain_count_30 > 3 )) ))" != 0 ]; then
+    fw_yesno__47_v0 "It looks like there are already some firewall rules. Do you want to remove them? (y/N)" 0
+    __status=$?
+    if [ "${__status}" != 0 ]; then
+        exit "${__status}"
+    fi
+    ret_fw_yesno47_v0__77_12="${ret_fw_yesno47_v0}"
+    if [ "${ret_fw_yesno47_v0__77_12}" != 0 ]; then
+        existing_29=""
+    fi
+fi
+rules_81="${existing_29}"
+rules_81+="-A INPUT -m conntrack --ctstate RELATED,ESTABLISHED -m comment --comment established -j ACCEPT
+"
+rules_81+="-A OUTPUT -m conntrack --ctstate RELATED,ESTABLISHED -m comment --comment established -j ACCEPT
+"
+rules_81+="-A INPUT -i lo -m comment --comment loopback -j ACCEPT
+"
+rules_81+="-A OUTPUT -o lo -m comment --comment loopback -j ACCEPT
+"
+rules_81+="-A INPUT -p icmp --icmp-type echo-request -m comment --comment ping -j ACCEPT
+"
+rules_81+="-A OUTPUT -p icmp --icmp-type echo-reply -m comment --comment ping -j ACCEPT
+"
+fw_yesno__47_v0 "Allow traffic to Splunk? (Y/n)" 1
+__status=$?
+if [ "${__status}" != 0 ]; then
+    exit "${__status}"
+fi
+ret_fw_yesno47_v0__95_8="${ret_fw_yesno47_v0}"
+if [ "${ret_fw_yesno47_v0__95_8}" != 0 ]; then
+    fw_addresses__49_v0 "Splunk indexer IPv4 address(es):" 1
+    __status=$?
+    if [ "${__status}" != 0 ]; then
+        exit "${__status}"
+    fi
+    ret_fw_addresses49_v0__96_24=("${ret_fw_addresses49_v0[@]}")
+    for address_156 in "${ret_fw_addresses49_v0__96_24[@]}"; do
+        fw_port_rule__53_v0 "OUTPUT" "tcp" "9997" "${address_156}" "Splunk"
+        __status=$?
+        if [ "${__status}" != 0 ]; then
+            exit "${__status}"
+        fi
+        rules_81+="${ret_fw_port_rule53_v0}"
+    done
+fi
+fw_yesno__47_v0 "Allow traffic to a syslog server? (y/N)" 0
+__status=$?
+if [ "${__status}" != 0 ]; then
+    exit "${__status}"
+fi
+ret_fw_yesno47_v0__101_8="${ret_fw_yesno47_v0}"
+if [ "${ret_fw_yesno47_v0__101_8}" != 0 ]; then
+    fw_addresses__49_v0 "Syslog server IPv4 address(es):" 1
+    __status=$?
+    if [ "${__status}" != 0 ]; then
+        exit "${__status}"
+    fi
+    ret_fw_addresses49_v0__102_24=("${ret_fw_addresses49_v0[@]}")
+    for address_259 in "${ret_fw_addresses49_v0__102_24[@]}"; do
+        array_38=("tcp" "udp")
+        for proto_260 in "${array_38[@]}"; do
+            fw_port_rule__53_v0 "OUTPUT" "${proto_260}" "514" "${address_259}" "syslog"
+            __status=$?
+            if [ "${__status}" != 0 ]; then
+                exit "${__status}"
+            fi
+            rules_81+="${ret_fw_port_rule53_v0}"
+        done
+    done
+fi
+fw_addresses__49_v0 "Space-separated DNS server IPv4 addresses (blank for none):" 0
+__status=$?
+if [ "${__status}" != 0 ]; then
+    exit "${__status}"
+fi
+dns_261=("${ret_fw_addresses49_v0[@]}")
+for address_262 in "${dns_261[@]}"; do
+    array_43=("tcp" "udp")
+    for proto_263 in "${array_43[@]}"; do
+        fw_port_rule__53_v0 "OUTPUT" "${proto_263}" "53" "${address_262}" "DNS"
+        __status=$?
+        if [ "${__status}" != 0 ]; then
+            exit "${__status}"
+        fi
+        rules_81+="${ret_fw_port_rule53_v0}"
+    done
+done
+fw_yesno__47_v0 "Allow all outbound HTTP/HTTPS traffic? (Y/n)" 1
+__status=$?
+if [ "${__status}" != 0 ]; then
+    exit "${__status}"
+fi
+ret_fw_yesno47_v0__114_8="${ret_fw_yesno47_v0}"
+if [ "${ret_fw_yesno47_v0__114_8}" != 0 ]; then
+    array_46=("80" "443")
+    for port_264 in "${array_46[@]}"; do
+        fw_port_rule__53_v0 "OUTPUT" "tcp" "${port_264}" "" "HTTP/S"
+        __status=$?
+        if [ "${__status}" != 0 ]; then
+            exit "${__status}"
+        fi
+        rules_81+="${ret_fw_port_rule53_v0}"
+    done
+fi
+fw_yesno__47_v0 "Allow all inbound SSH traffic? (y/N)" 0
+__status=$?
+if [ "${__status}" != 0 ]; then
+    exit "${__status}"
+fi
+ret_fw_yesno47_v0__119_8="${ret_fw_yesno47_v0}"
+if [ "${ret_fw_yesno47_v0__119_8}" != 0 ]; then
+    fw_port_rule__53_v0 "INPUT" "tcp" "22" "any" "SSH"
+    __status=$?
+    if [ "${__status}" != 0 ]; then
+        exit "${__status}"
+    fi
+    rules_81+="${ret_fw_port_rule53_v0}"
+fi
+array_49=("INPUT" "OUTPUT")
+for chain_265 in "${array_49[@]}"; do
+    array_52=("tcp" "udp")
+    for proto_266 in "${array_52[@]}"; do
+        fw_ports__54_v0 "${chain_265}" "${proto_266}" ""
+        __status=$?
+        if [ "${__status}" != 0 ]; then
+            exit "${__status}"
+        fi
+        rules_81+="${ret_fw_ports54_v0}"
+    done
+done
+fw_yesno__47_v0 "Is this machine bound to a domain? (y/N)" 0
+__status=$?
+if [ "${__status}" != 0 ]; then
+    exit "${__status}"
+fi
+ret_fw_yesno47_v0__129_8="${ret_fw_yesno47_v0}"
+if [ "${ret_fw_yesno47_v0__129_8}" != 0 ]; then
+    fw_addresses__49_v0 "Domain controller IPv4 addresses (blank uses DNS servers):" 0
+    __status=$?
+    if [ "${__status}" != 0 ]; then
+        exit "${__status}"
+    fi
+    controllers_281=("${ret_fw_addresses49_v0[@]}")
+    __length_53=("${controllers_281[@]}")
+    if [ "$(( ${#__length_53[@]} == 0 ))" != 0 ]; then
+        controllers_281=("${dns_261[@]}")
+    fi
+    __length_54=("${controllers_281[@]}")
+    if [ "$(( ${#__length_54[@]} == 0 ))" != 0 ]; then
+        fw_addresses__49_v0 "Domain membership requires at least one controller IPv4 address:" 1
+        __status=$?
+        if [ "${__status}" != 0 ]; then
+            exit "${__status}"
+        fi
+        controllers_281=("${ret_fw_addresses49_v0[@]}")
+    fi
+    for address_282 in "${controllers_281[@]}"; do
+        array_59=("tcp" "udp")
+        for proto_283 in "${array_59[@]}"; do
+            array_62=("88" "389")
+            for port_284 in "${array_62[@]}"; do
+                fw_port_rule__53_v0 "OUTPUT" "${proto_283}" "${port_284}" "${address_282}" "AD"
+                __status=$?
+                if [ "${__status}" != 0 ]; then
+                    exit "${__status}"
+                fi
+                rules_81+="${ret_fw_port_rule53_v0}"
+            done
+        done
+        array_65=("139" "445")
+        for port_285 in "${array_65[@]}"; do
+            fw_port_rule__53_v0 "OUTPUT" "tcp" "${port_285}" "${address_282}" "AD"
+            __status=$?
+            if [ "${__status}" != 0 ]; then
+                exit "${__status}"
+            fi
+            rules_81+="${ret_fw_port_rule53_v0}"
+        done
+    done
+fi
+fw_yesno__47_v0 "Allow specific ports to/from an IPv4 address or subnet? (y/N)" 0
+__status=$?
+if [ "${__status}" != 0 ]; then
+    exit "${__status}"
+fi
+ret_fw_yesno47_v0__144_8="${ret_fw_yesno47_v0}"
+if [ "${ret_fw_yesno47_v0__144_8}" != 0 ]; then
+    fw_addresses__49_v0 "Space-separated IPv4 addresses/subnets:" 1
+    __status=$?
+    if [ "${__status}" != 0 ]; then
+        exit "${__status}"
+    fi
+    ret_fw_addresses49_v0__145_24=("${ret_fw_addresses49_v0[@]}")
+    for address_286 in "${ret_fw_addresses49_v0__145_24[@]}"; do
+        array_70=("INPUT" "OUTPUT")
+        for chain_287 in "${array_70[@]}"; do
+            array_73=("tcp" "udp")
+            for proto_288 in "${array_73[@]}"; do
+                fw_ports__54_v0 "${chain_287}" "${proto_288}" "${address_286}"
+                __status=$?
+                if [ "${__status}" != 0 ]; then
+                    exit "${__status}"
+                fi
+                rules_81+="${ret_fw_ports54_v0}"
+            done
+        done
+    done
+fi
+rules_81+="-A OUTPUT -m limit --limit 5/min --limit-burst 10 -j LOG --log-prefix \"[iptables] OUTPUT DROP: \"
+"
+candidate_289="${declarations_28}""${rules_81}""COMMIT
+"
+command_74="$(mktemp /tmp/ccdc-fastfw.XXXXXX)"
+__status=$?
+if [ "${__status}" != 0 ]; then
+    exit "${__status}"
+fi
+path_290="${command_74}"
+result_291=0
+printf '%s' "${candidate_289}" > "${path_290}" && iptables-restore --test < "${path_290}"
+__status=$?
+if [ "${__status}" != 0 ]; then
+code_292="${__status}"
+    echo "Firewall rules validation failed (exit ${code_292}); no candidate rules were applied. Review the iptables-restore diagnostics above."
+    rm -f -- "${path_290}"
+    __status=$?
+    if [ "${__status}" != 0 ]; then
+        echo "Could not remove temporary rules file: ${path_290}"
+    fi
+    exit "${code_292}"
+fi
+if [ "$(( result_291 == 0 ))" != 0 ]; then
+    echo "Rules validated. Confirm within 5 seconds to keep them; otherwise the previous rules are restored."
+    iptables-apply -t 5 "${path_290}"
+    __status=$?
+    if [ "${__status}" != 0 ]; then
+    code_293="${__status}"
+        result_291="${code_293}"
+    fi
+fi
+rm -f -- "${path_290}"
+__status=$?
+if [ "${__status}" != 0 ]; then
+    exit "${__status}"
+fi
+if [ "$(( result_291 != 0 ))" != 0 ]; then
+    echo "Firewall changes were not confirmed or could not be applied."
+    exit "${result_291}"
+fi
+sysctl -w "kernel.printk=3 3 3 3"
+__status=$?
+if [ "${__status}" != 0 ]; then
+code_294="${__status}"
+    echo "IPv4 firewall was applied, but setting kernel.printk failed."
+    exit "${code_294}"
+fi
+command_75="$(command -v iptables-restore)"
+__status=$?
+if [ "${__status}" != 0 ]; then
+    exit "${__status}"
+fi
+restore_295="${command_75}"
+unit_296="[Unit]
+Description=CCDC IPv4 filter rules
+DefaultDependencies=no
+After=local-fs.target
+Before=network-pre.target
+Wants=network-pre.target
+
+[Service]
+Type=oneshot
+ExecStart=${restore_295} /etc/ccdc/fastfw.rules
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target
+"
+command -v systemctl > /dev/null && install -d -m 755 /etc/ccdc /etc/sysctl.d /etc/systemd/system && iptables-save -t filter > /etc/ccdc/fastfw.rules && chmod 600 /etc/ccdc/fastfw.rules && printf '%s' 'kernel.printk = 3 3 3 3' > /etc/sysctl.d/90-ccdc-fastfw.conf && printf '%s' "${unit_296}" > /etc/systemd/system/ccdc-fastfw.service && systemctl daemon-reload && systemctl enable ccdc-fastfw.service
+__status=$?
+if [ "${__status}" != 0 ]; then
+code_297="${__status}"
+    echo "IPv4 firewall and kernel.printk are active, but reboot persistence failed (exit ${code_297}). Check /etc/ccdc/fastfw.rules, /etc/sysctl.d/90-ccdc-fastfw.conf and ccdc-fastfw.service before rebooting. Persistence requires systemd."
+    exit "${code_297}"
+fi
+echo "IPv4 firewall applied and saved for reboot with ccdc-fastfw.service; kernel.printk persisted in /etc/sysctl.d/90-ccdc-fastfw.conf."
