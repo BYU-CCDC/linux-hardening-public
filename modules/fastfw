@@ -864,7 +864,7 @@ if [ "${__status}" != 0 ]; then
 fi
 ret_fw_yesno47_v0__119_8="${ret_fw_yesno47_v0}"
 if [ "${ret_fw_yesno47_v0__119_8}" != 0 ]; then
-    fw_port_rule__53_v0 "INPUT" "tcp" "22" "any" "SSH"
+    fw_port_rule__53_v0 "INPUT" "tcp" "22" "" "SSH"
     __status=$?
     if [ "${__status}" != 0 ]; then
         exit "${__status}"
@@ -890,7 +890,7 @@ if [ "${__status}" != 0 ]; then
 fi
 ret_fw_yesno47_v0__129_8="${ret_fw_yesno47_v0}"
 if [ "${ret_fw_yesno47_v0__129_8}" != 0 ]; then
-    fw_addresses__49_v0 "Domain controller IPv4 addresses (blank uses DNS servers):" 0
+    fw_addresses__49_v0 "Space-separated domain controller IPv4 addresses (blank uses DNS servers):" 0
     __status=$?
     if [ "${__status}" != 0 ]; then
         exit "${__status}"
@@ -902,7 +902,7 @@ if [ "${ret_fw_yesno47_v0__129_8}" != 0 ]; then
     fi
     __length_54=("${controllers_281[@]}")
     if [ "$(( ${#__length_54[@]} == 0 ))" != 0 ]; then
-        fw_addresses__49_v0 "Domain membership requires at least one controller IPv4 address:" 1
+        fw_addresses__49_v0 "Space-separated domain controller IPv4 addresses (at least one required):" 1
         __status=$?
         if [ "${__status}" != 0 ]; then
             exit "${__status}"
@@ -910,6 +910,12 @@ if [ "${ret_fw_yesno47_v0__129_8}" != 0 ]; then
         controllers_281=("${ret_fw_addresses49_v0[@]}")
     fi
     for address_282 in "${controllers_281[@]}"; do
+        fw_port_rule__53_v0 "OUTPUT" "udp" "123" "${address_282}" "NTP"
+        __status=$?
+        if [ "${__status}" != 0 ]; then
+            exit "${__status}"
+        fi
+        rules_81+="${ret_fw_port_rule53_v0}"
         array_59=("tcp" "udp")
         for proto_283 in "${array_59[@]}"; do
             array_62=("88" "389")
@@ -938,15 +944,15 @@ __status=$?
 if [ "${__status}" != 0 ]; then
     exit "${__status}"
 fi
-ret_fw_yesno47_v0__144_8="${ret_fw_yesno47_v0}"
-if [ "${ret_fw_yesno47_v0__144_8}" != 0 ]; then
+ret_fw_yesno47_v0__145_8="${ret_fw_yesno47_v0}"
+if [ "${ret_fw_yesno47_v0__145_8}" != 0 ]; then
     fw_addresses__49_v0 "Space-separated IPv4 addresses/subnets:" 1
     __status=$?
     if [ "${__status}" != 0 ]; then
         exit "${__status}"
     fi
-    ret_fw_addresses49_v0__145_24=("${ret_fw_addresses49_v0[@]}")
-    for address_286 in "${ret_fw_addresses49_v0__145_24[@]}"; do
+    ret_fw_addresses49_v0__146_24=("${ret_fw_addresses49_v0[@]}")
+    for address_286 in "${ret_fw_addresses49_v0__146_24[@]}"; do
         array_70=("INPUT" "OUTPUT")
         for chain_287 in "${array_70[@]}"; do
             array_73=("tcp" "udp")
