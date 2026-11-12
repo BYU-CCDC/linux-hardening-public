@@ -364,39 +364,39 @@ fw_address__47_v0() {
 }
 
 # dir_exists(path: Text)
-dir_exists__58_v0() {
+dir_exists__59_v0() {
     local path_719="${1}"
     [ -d "${path_719}" ]
     __status=$?
-    ret_dir_exists58_v0="$(( __status == 0 ))"
+    ret_dir_exists59_v0="$(( __status == 0 ))"
     return 0
 }
 
 # file_exists(path: Text)
-file_exists__59_v0() {
+file_exists__60_v0() {
     local path_706="${1}"
     [ -f "${path_706}" ]
     __status=$?
-    ret_file_exists59_v0="$(( __status == 0 ))"
+    ret_file_exists60_v0="$(( __status == 0 ))"
     return 0
 }
 
 # file_read(path: Text)
-file_read__60_v0() {
+file_read__61_v0() {
     local path_707="${1}"
     local command_11
     command_11="$(< "${path_707}")"
     __status=$?
     if [ "${__status}" != 0 ]; then
-        ret_file_read60_v0=''
+        ret_file_read61_v0=''
         return "${__status}"
     fi
-    ret_file_read60_v0="${command_11}"
+    ret_file_read61_v0="${command_11}"
     return 0
 }
 
 # file_write(path: Text, content: Text)
-file_write__61_v0() {
+file_write__62_v0() {
     local path_746="${1}"
     local content_747="${2}"
     local command_12
@@ -404,33 +404,33 @@ file_write__61_v0() {
 ' "${content_747}" > "${path_746}")"
     __status=$?
     if [ "${__status}" != 0 ]; then
-        ret_file_write61_v0=''
+        ret_file_write62_v0=''
         return "${__status}"
     fi
-    ret_file_write61_v0="${command_12}"
+    ret_file_write62_v0="${command_12}"
     return 0
 }
 
 # dir_create(path: Text)
-dir_create__64_v0() {
+dir_create__65_v0() {
     local path_718="${1}"
-    dir_exists__58_v0 "${path_718}"
-    local ret_dir_exists58_v0__87_12="${ret_dir_exists58_v0}"
-    if [ "$(( ! ret_dir_exists58_v0__87_12 ))" != 0 ]; then
+    dir_exists__59_v0 "${path_718}"
+    local ret_dir_exists59_v0__87_12="${ret_dir_exists59_v0}"
+    if [ "$(( ! ret_dir_exists59_v0__87_12 ))" != 0 ]; then
         mkdir -p "${path_718}"
         __status=$?
         if [ "${__status}" != 0 ]; then
-            ret_dir_create64_v0=''
+            ret_dir_create65_v0=''
             return "${__status}"
         fi
     fi
 }
 
 __VERBOSITY_3=0
-__GITHUB_URL_4="https://raw.githubusercontent.com/BYU-CCDC/linux-hardening-public/refs/heads/main/"
+__GITHUB_URL_4="https://git.kchatt.dev/Kai/linux-hardening/raw/branch/main/build/"
 __MOD_DIR_6="/usr/lib/ccdc/modules/"
 # log(message: Text, level: Int)
-log__83_v0() {
+log__84_v0() {
     local message_703="${1}"
     local level_704="${2}"
     local log_levels_705=("[INFO]	" "[VERBOSE]	" "[DEBUG]	")
@@ -440,13 +440,13 @@ log__83_v0() {
 }
 
 # error(message: Text)
-error__84_v0() {
+error__85_v0() {
     local message_697="${1}"
     echo "[ERROR]: ""${message_697}"
 }
 
 # build_url(relative_path: Text)
-build_url__87_v0() {
+build_url__88_v0() {
     local relative_path_722="${1}"
     local base_723="${__GITHUB_URL_4}"
     local __length_14="${base_723}"
@@ -460,12 +460,12 @@ build_url__87_v0() {
         slice__24_v0 "${base_723}" 0 "$(( ${#__length_15} - 1 ))"
         base_723="${ret_slice24_v0}"
     done
-    ret_build_url87_v0="${base_723}""/""${relative_path_722}"
+    ret_build_url88_v0="${base_723}""/""${relative_path_722}"
     return 0
 }
 
 # validate_module(mod_name: Text, mod_code: Text)
-validate_module__88_v0() {
+validate_module__89_v0() {
     local mod_name_711="${1}"
     local mod_code_712="${2}"
     local name_pattern_713="^# @module_name: [^[:space:]]+[[:space:]]*\$"
@@ -484,8 +484,8 @@ validate_module__88_v0() {
     if [ "${__status}" != 0 ]; then
     line_number_715="${__status}"
         local fields_716=("Bash shebang" "@module_name" "@mod-imports")
-        error__84_v0 "VALIDATE_MODULE: ${mod_name_711}: missing or invalid ${fields_716[$(( line_number_715 - 1 ))]?"Index out of bounds (at src/modules/../utils/modules.ab:30:72)"} on line ${line_number_715}"
-        ret_validate_module88_v0=''
+        error__85_v0 "VALIDATE_MODULE: ${mod_name_711}: missing or invalid ${fields_716[$(( line_number_715 - 1 ))]?"Index out of bounds (at src/modules/../utils/modules.ab:30:72)"} on line ${line_number_715}"
+        ret_validate_module89_v0=''
         return 1
     fi
     printf '%s
@@ -493,40 +493,40 @@ validate_module__88_v0() {
     __status=$?
     if [ "${__status}" != 0 ]; then
     code_717="${__status}"
-        error__84_v0 "VALIDATE_MODULE: ${mod_name_711}: invalid Bash syntax (exit ${code_717})"
-        ret_validate_module88_v0=''
+        error__85_v0 "VALIDATE_MODULE: ${mod_name_711}: invalid Bash syntax (exit ${code_717})"
+        ret_validate_module89_v0=''
         return "${code_717}"
     fi
-    log__83_v0 "VALIDATE_MODULE: ${mod_name_711}: header and Bash syntax valid" 2
+    log__84_v0 "VALIDATE_MODULE: ${mod_name_711}: header and Bash syntax valid" 2
 }
 
 # is_downloaded(mod_name: Text)
-is_downloaded__89_v0() {
+is_downloaded__90_v0() {
     local mod_name_701="${1}"
     local mod_path_702="${__MOD_DIR_6}""${mod_name_701}"
-    log__83_v0 "IS_DOWNLOADED: Resolved mod_name = ${mod_path_702}" 2
-    log__83_v0 "IS_DOWNLOADED: Checking if ${mod_path_702} is downloaded" 1
-    file_exists__59_v0 "${__MOD_DIR_6}""${mod_name_701}"
-    local ret_file_exists59_v0__46_8="${ret_file_exists59_v0}"
-    if [ "${ret_file_exists59_v0__46_8}" != 0 ]; then
-        log__83_v0 "IS_DOWNLOADED: ${mod_path_702} is downloaded" 1
-        ret_is_downloaded89_v0=1
+    log__84_v0 "IS_DOWNLOADED: Resolved mod_name = ${mod_path_702}" 2
+    log__84_v0 "IS_DOWNLOADED: Checking if ${mod_path_702} is downloaded" 1
+    file_exists__60_v0 "${__MOD_DIR_6}""${mod_name_701}"
+    local ret_file_exists60_v0__46_8="${ret_file_exists60_v0}"
+    if [ "${ret_file_exists60_v0__46_8}" != 0 ]; then
+        log__84_v0 "IS_DOWNLOADED: ${mod_path_702} is downloaded" 1
+        ret_is_downloaded90_v0=1
         return 0
     else
-        log__83_v0 "IS_DOWNLOADED: ${mod_path_702} not downloaded" 1
-        ret_is_downloaded89_v0=0
+        log__84_v0 "IS_DOWNLOADED: ${mod_path_702} not downloaded" 1
+        ret_is_downloaded90_v0=0
         return 0
     fi
 }
 
 # download(mod_name: Text)
-download__90_v0() {
+download__91_v0() {
     local mod_name_721="${1}"
-    build_url__87_v0 "modules/""${mod_name_721}"
-    local url_730="${ret_build_url87_v0}"
+    build_url__88_v0 "modules/""${mod_name_721}"
+    local url_730="${ret_build_url88_v0}"
     local destination_731="${__MOD_DIR_6}""${mod_name_721}"
-    log__83_v0 "DOWNLOAD: Downloading ${mod_name_721}" 0
-    log__83_v0 "DOWNLOAD: URL = ${url_730}; destination = ${destination_731}" 2
+    log__84_v0 "DOWNLOAD: Downloading ${mod_name_721}" 0
+    log__84_v0 "DOWNLOAD: URL = ${url_730}; destination = ${destination_731}" 2
     local mod_code_732=""
     local download_status_733=0
     local has_curl_734=1
@@ -552,8 +552,8 @@ download__90_v0() {
             has_wget_736=0
         fi
         if [ "$(( ! has_wget_736 ))" != 0 ]; then
-            error__84_v0 "DOWNLOAD: ${mod_name_721}: no curl or wget; URL = ${url_730}; destination = ${destination_731}; exit 1"
-            ret_download90_v0=''
+            error__85_v0 "DOWNLOAD: ${mod_name_721}: no curl or wget; URL = ${url_730}; destination = ${destination_731}; exit 1"
+            ret_download91_v0=''
             return 1
         fi
         local command_18
@@ -566,42 +566,42 @@ download__90_v0() {
         mod_code_732="${command_18}"
     fi
     if [ "$(( download_status_733 != 0 ))" != 0 ]; then
-        error__84_v0 "DOWNLOAD: ${mod_name_721}: failed; URL = ${url_730}; destination = ${destination_731}; exit ${download_status_733}"
-        ret_download90_v0=''
+        error__85_v0 "DOWNLOAD: ${mod_name_721}: failed; URL = ${url_730}; destination = ${destination_731}; exit ${download_status_733}"
+        ret_download91_v0=''
         return "${download_status_733}"
     fi
-    validate_module__88_v0 "${mod_name_721}" "${mod_code_732}"
+    validate_module__89_v0 "${mod_name_721}" "${mod_code_732}"
     __status=$?
     if [ "${__status}" != 0 ]; then
     code_738="${__status}"
-        error__84_v0 "DOWNLOAD: ${mod_name_721}: invalid response; URL = ${url_730}; destination = ${destination_731}; exit ${code_738}"
-        ret_download90_v0=''
+        error__85_v0 "DOWNLOAD: ${mod_name_721}: invalid response; URL = ${url_730}; destination = ${destination_731}; exit ${code_738}"
+        ret_download91_v0=''
         return "${code_738}"
     fi
-    log__83_v0 "DOWNLOAD: Downloaded and validated ${mod_name_721}" 1
-    ret_download90_v0="${mod_code_732}"
+    log__84_v0 "DOWNLOAD: Downloaded and validated ${mod_name_721}" 1
+    ret_download91_v0="${mod_code_732}"
     return 0
 }
 
 # write_dep(mod_name: Text, dep_code: Text)
-write_dep__91_v0() {
+write_dep__92_v0() {
     local mod_name_740="${1}"
     local dep_code_741="${2}"
     local dep_path_742="${__MOD_DIR_6}""${mod_name_740}"
-    log__83_v0 "WRITE_DEP: Resolved dep_path = ${dep_path_742}" 2
-    log__83_v0 "WRITE_DEP: Writing ${dep_path_742}" 0
+    log__84_v0 "WRITE_DEP: Resolved dep_path = ${dep_path_742}" 2
+    log__84_v0 "WRITE_DEP: Writing ${dep_path_742}" 0
     local command_19
     command_19="$(mktemp "${dep_path_742}.XXXXXX")"
     __status=$?
     if [ "${__status}" != 0 ]; then
     code_743="${__status}"
-        error__84_v0 "WRITE_DEP: Failed to create temporary file for ${dep_path_742} (exit ${code_743})"
-        ret_write_dep91_v0=''
+        error__85_v0 "WRITE_DEP: Failed to create temporary file for ${dep_path_742} (exit ${code_743})"
+        ret_write_dep92_v0=''
         return "${code_743}"
     fi
     local temp_path_744="${command_19}"
     local write_status_745=0
-    file_write__61_v0 "${temp_path_744}" "${dep_code_741}"
+    file_write__62_v0 "${temp_path_744}" "${dep_code_741}"
     __status=$?
     if [ "${__status}" != 0 ]; then
     code_748="${__status}"
@@ -619,51 +619,51 @@ write_dep__91_v0() {
         rm -f -- "${temp_path_744}"
         __status=$?
         if [ "${__status}" != 0 ]; then
-            ret_write_dep91_v0=''
+            ret_write_dep92_v0=''
             return "${__status}"
         fi
-        error__84_v0 "WRITE_DEP: Failed to save ${dep_path_742} (exit ${write_status_745}); existing cache unchanged"
-        ret_write_dep91_v0=''
+        error__85_v0 "WRITE_DEP: Failed to save ${dep_path_742} (exit ${write_status_745}); existing cache unchanged"
+        ret_write_dep92_v0=''
         return "${write_status_745}"
     fi
-    log__83_v0 "WRITE_DEP: Saved ${dep_path_742}" 1
+    log__84_v0 "WRITE_DEP: Saved ${dep_path_742}" 1
 }
 
 # make_ccdc_dir()
-make_ccdc_dir__92_v0() {
-    log__83_v0 "MAKE_CCDC_DIR: Creating ${__MOD_DIR_6}" 0
-    dir_create__64_v0 "${__MOD_DIR_6}"
+make_ccdc_dir__93_v0() {
+    log__84_v0 "MAKE_CCDC_DIR: Creating ${__MOD_DIR_6}" 0
+    dir_create__65_v0 "${__MOD_DIR_6}"
     __status=$?
     if [ "${__status}" != 0 ]; then
     code_720="${__status}"
-        error__84_v0 "MAKE_CCDC_DIR: Failed to create ${__MOD_DIR_6} (exit ${code_720})"
-        ret_make_ccdc_dir92_v0=''
+        error__85_v0 "MAKE_CCDC_DIR: Failed to create ${__MOD_DIR_6} (exit ${code_720})"
+        ret_make_ccdc_dir93_v0=''
         return "${code_720}"
     fi
-    log__83_v0 "MAKE_CCDC_DIR: Directory ready" 1
+    log__84_v0 "MAKE_CCDC_DIR: Directory ready" 1
 }
 
 # extract_imports(mod_name: Text)
-extract_imports__93_v0() {
+extract_imports__94_v0() {
     local mod_name_750="${1}"
     local mod_path_751="${__MOD_DIR_6}""${mod_name_750}"
-    log__83_v0 "EXTRACT_IMPORTS: Reading header from ${mod_path_751}" 2
-    file_exists__59_v0 "${mod_path_751}"
-    local ret_file_exists59_v0__135_12="${ret_file_exists59_v0}"
-    if [ "$(( ! ret_file_exists59_v0__135_12 ))" != 0 ]; then
-        error__84_v0 "EXTRACT_IMPORTS: Module file missing: ${mod_path_751}"
-        ret_extract_imports93_v0=()
+    log__84_v0 "EXTRACT_IMPORTS: Reading header from ${mod_path_751}" 2
+    file_exists__60_v0 "${mod_path_751}"
+    local ret_file_exists60_v0__135_12="${ret_file_exists60_v0}"
+    if [ "$(( ! ret_file_exists60_v0__135_12 ))" != 0 ]; then
+        error__85_v0 "EXTRACT_IMPORTS: Module file missing: ${mod_path_751}"
+        ret_extract_imports94_v0=()
         return 1
     fi
-    file_read__60_v0 "${mod_path_751}"
+    file_read__61_v0 "${mod_path_751}"
     __status=$?
     if [ "${__status}" != 0 ]; then
     code_752="${__status}"
-        error__84_v0 "EXTRACT_IMPORTS: Failed to read ${mod_path_751} (exit ${code_752})"
-        ret_extract_imports93_v0=()
+        error__85_v0 "EXTRACT_IMPORTS: Failed to read ${mod_path_751} (exit ${code_752})"
+        ret_extract_imports94_v0=()
         return "${code_752}"
     fi
-    local mod_code_753="${ret_file_read60_v0}"
+    local mod_code_753="${ret_file_read61_v0}"
     local imports_754=()
     split_lines__5_v0 "${mod_code_753}"
     local ret_split_lines5_v0__144_17=("${ret_split_lines5_v0[@]}")
@@ -704,71 +704,71 @@ extract_imports__93_v0() {
                 trim__10_v0 "${entry_768}"
                 local imported_module_769="${ret_trim10_v0}"
                 if [ "$([ "_${imported_module_769}" == "_" ]; echo $?)" != 0 ]; then
-                    log__83_v0 "EXTRACT_IMPORTS: Found import ${imported_module_769}" 2
+                    log__84_v0 "EXTRACT_IMPORTS: Found import ${imported_module_769}" 2
                     imports_754+=("${imported_module_769}")
                 fi
             done
-            ret_extract_imports93_v0=("${imports_754[@]}")
+            ret_extract_imports94_v0=("${imports_754[@]}")
             return 0
         fi
     done
-    log__83_v0 "EXTRACT_IMPORTS: No import declaration in ${mod_name_750}" 2
-    ret_extract_imports93_v0=("${imports_754[@]}")
+    log__84_v0 "EXTRACT_IMPORTS: No import declaration in ${mod_name_750}" 2
+    ret_extract_imports94_v0=("${imports_754[@]}")
     return 0
 }
 
 # ensure_module(mod_name: Text)
-ensure_module__94_v0() {
+ensure_module__95_v0() {
     local mod_name_699="${1}"
     local mod_path_700="${__MOD_DIR_6}""${mod_name_699}"
-    is_downloaded__89_v0 "${mod_name_699}"
-    local ret_is_downloaded89_v0__175_8="${ret_is_downloaded89_v0}"
-    if [ "${ret_is_downloaded89_v0__175_8}" != 0 ]; then
-        file_read__60_v0 "${__MOD_DIR_6}""${mod_name_699}"
+    is_downloaded__90_v0 "${mod_name_699}"
+    local ret_is_downloaded90_v0__175_8="${ret_is_downloaded90_v0}"
+    if [ "${ret_is_downloaded90_v0__175_8}" != 0 ]; then
+        file_read__61_v0 "${__MOD_DIR_6}""${mod_name_699}"
         __status=$?
         if [ "${__status}" != 0 ]; then
         code_708="${__status}"
-            error__84_v0 "CACHE: Cannot read ${mod_path_700} (exit ${code_708})"
-            ret_ensure_module94_v0=''
+            error__85_v0 "CACHE: Cannot read ${mod_path_700} (exit ${code_708})"
+            ret_ensure_module95_v0=''
             return "${code_708}"
         fi
-        local cached_code_709="${ret_file_read60_v0}"
+        local cached_code_709="${ret_file_read61_v0}"
         local valid_710=1
-        validate_module__88_v0 "${mod_name_699}" "${cached_code_709}"
+        validate_module__89_v0 "${mod_name_699}" "${cached_code_709}"
         __status=$?
         if [ "${__status}" != 0 ]; then
             valid_710=0
         fi
         if [ "${valid_710}" != 0 ]; then
-            log__83_v0 "CACHE: Keeping validated ${mod_name_699}" 1
-            ret_ensure_module94_v0=''
+            log__84_v0 "CACHE: Keeping validated ${mod_name_699}" 1
+            ret_ensure_module95_v0=''
             return 0
         fi
-        log__83_v0 "CACHE: Replacing invalid ${mod_path_700}" 0
+        log__84_v0 "CACHE: Replacing invalid ${mod_path_700}" 0
     fi
-    make_ccdc_dir__92_v0 
+    make_ccdc_dir__93_v0 
     __status=$?
     if [ "${__status}" != 0 ]; then
-        ret_ensure_module94_v0=''
+        ret_ensure_module95_v0=''
         return "${__status}"
     fi
-    download__90_v0 "${mod_name_699}"
+    download__91_v0 "${mod_name_699}"
     __status=$?
     if [ "${__status}" != 0 ]; then
-        ret_ensure_module94_v0=''
+        ret_ensure_module95_v0=''
         return "${__status}"
     fi
-    local mod_code_739="${ret_download90_v0}"
-    write_dep__91_v0 "${mod_name_699}" "${mod_code_739}"
+    local mod_code_739="${ret_download91_v0}"
+    write_dep__92_v0 "${mod_name_699}" "${mod_code_739}"
     __status=$?
     if [ "${__status}" != 0 ]; then
-        ret_ensure_module94_v0=''
+        ret_ensure_module95_v0=''
         return "${__status}"
     fi
 }
 
 # prepare_module(mod_name: Text, chain: [Text], prepared: [Text])
-prepare_module__95_v0() {
+prepare_module__96_v0() {
     local mod_name_691="${1}"
     local chain_692=("${!2}")
     local -n prepared_693="${3}"
@@ -778,37 +778,37 @@ prepare_module__95_v0() {
             for entry_696 in "${chain_692[@]}"; do
                 cycle_695+="${entry_696}"" -> "
             done
-            error__84_v0 "IMPORT_MODULE: Dependency cycle: ${cycle_695}${mod_name_691}"
-            ret_prepare_module95_v0=''
+            error__85_v0 "IMPORT_MODULE: Dependency cycle: ${cycle_695}${mod_name_691}"
+            ret_prepare_module96_v0=''
             return 1
         fi
     done
     for ready_698 in "${prepared_693[@]}"; do
         if [ "$([ "_${ready_698}" != "_${mod_name_691}" ]; echo $?)" != 0 ]; then
-            ret_prepare_module95_v0=''
+            ret_prepare_module96_v0=''
             return 0
         fi
     done
-    ensure_module__94_v0 "${mod_name_691}"
+    ensure_module__95_v0 "${mod_name_691}"
     __status=$?
     if [ "${__status}" != 0 ]; then
-        ret_prepare_module95_v0=''
+        ret_prepare_module96_v0=''
         return "${__status}"
     fi
-    extract_imports__93_v0 "${mod_name_691}"
+    extract_imports__94_v0 "${mod_name_691}"
     __status=$?
     if [ "${__status}" != 0 ]; then
-        ret_prepare_module95_v0=''
+        ret_prepare_module96_v0=''
         return "${__status}"
     fi
-    local imports_770=("${ret_extract_imports93_v0[@]}")
+    local imports_770=("${ret_extract_imports94_v0[@]}")
     local array_33=("${mod_name_691}")
     local next_chain_771=("${chain_692[@]}" "${array_33[@]}")
     for dependency_772 in "${imports_770[@]}"; do
-        prepare_module__95_v0 "${dependency_772}" next_chain_771[@] "${!prepared_693}"
+        prepare_module__96_v0 "${dependency_772}" next_chain_771[@] "${!prepared_693}"
         __status=$?
         if [ "${__status}" != 0 ]; then
-            ret_prepare_module95_v0=''
+            ret_prepare_module96_v0=''
             return "${__status}"
         fi
     done
@@ -816,70 +816,70 @@ prepare_module__95_v0() {
 }
 
 # import_module(module_name: Text)
-import_module__96_v0() {
+import_module__97_v0() {
     local module_name_689="${1}"
     local prepared_690=()
     local array_39=()
-    prepare_module__95_v0 "${module_name_689}" array_39[@] "prepared_690"
+    prepare_module__96_v0 "${module_name_689}" array_39[@] "prepared_690"
     __status=$?
     if [ "${__status}" != 0 ]; then
-        ret_import_module96_v0=''
+        ret_import_module97_v0=''
         return "${__status}"
     fi
 }
 
 # run_module(module_name: Text, module_args: [Text])
-run_module__97_v0() {
+run_module__98_v0() {
     local module_name_804="${1}"
     local module_args_805=("${!2}")
-    import_module__96_v0 "${module_name_804}"
+    import_module__97_v0 "${module_name_804}"
     __status=$?
     if [ "${__status}" != 0 ]; then
-        ret_run_module97_v0=''
+        ret_run_module98_v0=''
         return "${__status}"
     fi
     local mod_path_806="${__MOD_DIR_6}""${module_name_804}"
-    log__83_v0 "RUN_MODULE: Executing ${mod_path_806}" 0
+    log__84_v0 "RUN_MODULE: Executing ${mod_path_806}" 0
     local __length_40=("${module_args_805[@]}")
     local argument_count_807="${#__length_40[@]}"
-    log__83_v0 "RUN_MODULE: Forwarding ${argument_count_807} arguments" 2
+    log__84_v0 "RUN_MODULE: Forwarding ${argument_count_807} arguments" 2
     bash -p -- "${mod_path_806}" "${module_args_805[@]}"
     __status=$?
     if [ "${__status}" != 0 ]; then
     code_808="${__status}"
-        error__84_v0 "RUN_MODULE: ${module_name_804} failed (exit ${code_808})"
-        ret_run_module97_v0=''
+        error__85_v0 "RUN_MODULE: ${module_name_804} failed (exit ${code_808})"
+        ret_run_module98_v0=''
         return "${code_808}"
     fi
 }
 
 # run_module(module_name: Text, module_args: [])
-run_module__97_v1() {
+run_module__98_v1() {
     local module_name_820="${1}"
     local module_args_821=("${!2}")
-    import_module__96_v0 "${module_name_820}"
+    import_module__97_v0 "${module_name_820}"
     __status=$?
     if [ "${__status}" != 0 ]; then
-        ret_run_module97_v1=''
+        ret_run_module98_v1=''
         return "${__status}"
     fi
     local mod_path_822="${__MOD_DIR_6}""${module_name_820}"
-    log__83_v0 "RUN_MODULE: Executing ${mod_path_822}" 0
+    log__84_v0 "RUN_MODULE: Executing ${mod_path_822}" 0
     local __length_41=("${module_args_821[@]}")
     local argument_count_823="${#__length_41[@]}"
-    log__83_v0 "RUN_MODULE: Forwarding ${argument_count_823} arguments" 2
+    log__84_v0 "RUN_MODULE: Forwarding ${argument_count_823} arguments" 2
     bash -p -- "${mod_path_822}" "${module_args_821[@]}"
     __status=$?
     if [ "${__status}" != 0 ]; then
     code_824="${__status}"
-        error__84_v0 "RUN_MODULE: ${module_name_820} failed (exit ${code_824})"
-        ret_run_module97_v1=''
+        error__85_v0 "RUN_MODULE: ${module_name_820} failed (exit ${code_824})"
+        ret_run_module98_v1=''
         return "${code_824}"
     fi
 }
 
 # run_step(module_name: Text, module_args: [Text])
-run_step__101_v0() {
+run_step__102_v0() {
     local module_name_801="${1}"
     local module_args_802=("${!2}")
     echo "Running ${module_name_801}. Ctrl+C skips this step; changes already made are not undone."
@@ -888,11 +888,11 @@ run_step__101_v0() {
       trap 'ccdc_step_interrupted=1' INT
     __status=$?
     if [ "${__status}" != 0 ]; then
-        ret_run_step101_v0=''
+        ret_run_step102_v0=''
         return "${__status}"
     fi
     local result_803=0
-    run_module__97_v0 "${module_name_801}" module_args_802[@]
+    run_module__98_v0 "${module_name_801}" module_args_802[@]
     __status=$?
     if [ "${__status}" != 0 ]; then
     code_809="${__status}"
@@ -907,19 +907,19 @@ run_step__101_v0() {
     if [ -n "$ccdc_saved_int" ]; then eval "$ccdc_saved_int"; else trap - INT; fi
     __status=$?
     if [ "${__status}" != 0 ]; then
-        ret_run_step101_v0=''
+        ret_run_step102_v0=''
         return "${__status}"
     fi
     if [ "$(( interrupted_810 || $(( result_803 == 130 )) ))" != 0 ]; then
         echo "Skipped ${module_name_801} after Ctrl+C."
-        ret_run_step101_v0=''
+        ret_run_step102_v0=''
         return 0
     fi
     if [ "$(( result_803 != 0 ))" != 0 ]; then
         trap 'exit 130' INT
         __status=$?
         if [ "${__status}" != 0 ]; then
-            ret_run_step101_v0=''
+            ret_run_step102_v0=''
             return "${__status}"
         fi
         fw_yesno__46_v0 "Module failed (exit ${result_803}). Skip and continue? [y/N]" 0
@@ -928,21 +928,21 @@ run_step__101_v0() {
             if [ -n "$ccdc_saved_int" ]; then eval "$ccdc_saved_int"; else trap - INT; fi
             __status=$?
             if [ "${__status}" != 0 ]; then
-                ret_run_step101_v0=''
+                ret_run_step102_v0=''
                 return "${__status}"
             fi
-            ret_run_step101_v0=''
+            ret_run_step102_v0=''
             return "${result_803}"
         fi
         local skip_816="${ret_fw_yesno46_v0}"
         if [ -n "$ccdc_saved_int" ]; then eval "$ccdc_saved_int"; else trap - INT; fi
         __status=$?
         if [ "${__status}" != 0 ]; then
-            ret_run_step101_v0=''
+            ret_run_step102_v0=''
             return "${__status}"
         fi
         if [ "$(( ! skip_816 ))" != 0 ]; then
-            ret_run_step101_v0=''
+            ret_run_step102_v0=''
             return "${result_803}"
         fi
         echo "Skipped ${module_name_801} after failure (exit ${result_803})."
@@ -950,7 +950,7 @@ run_step__101_v0() {
 }
 
 # run_step(module_name: Text, module_args: [])
-run_step__101_v1() {
+run_step__102_v1() {
     local module_name_817="${1}"
     local module_args_818=("${!2}")
     echo "Running ${module_name_817}. Ctrl+C skips this step; changes already made are not undone."
@@ -959,11 +959,11 @@ run_step__101_v1() {
       trap 'ccdc_step_interrupted=1' INT
     __status=$?
     if [ "${__status}" != 0 ]; then
-        ret_run_step101_v1=''
+        ret_run_step102_v1=''
         return "${__status}"
     fi
     local result_819=0
-    run_module__97_v1 "${module_name_817}" module_args_818[@]
+    run_module__98_v1 "${module_name_817}" module_args_818[@]
     __status=$?
     if [ "${__status}" != 0 ]; then
     code_825="${__status}"
@@ -978,19 +978,19 @@ run_step__101_v1() {
     if [ -n "$ccdc_saved_int" ]; then eval "$ccdc_saved_int"; else trap - INT; fi
     __status=$?
     if [ "${__status}" != 0 ]; then
-        ret_run_step101_v1=''
+        ret_run_step102_v1=''
         return "${__status}"
     fi
     if [ "$(( interrupted_826 || $(( result_819 == 130 )) ))" != 0 ]; then
         echo "Skipped ${module_name_817} after Ctrl+C."
-        ret_run_step101_v1=''
+        ret_run_step102_v1=''
         return 0
     fi
     if [ "$(( result_819 != 0 ))" != 0 ]; then
         trap 'exit 130' INT
         __status=$?
         if [ "${__status}" != 0 ]; then
-            ret_run_step101_v1=''
+            ret_run_step102_v1=''
             return "${__status}"
         fi
         fw_yesno__46_v0 "Module failed (exit ${result_819}). Skip and continue? [y/N]" 0
@@ -999,21 +999,21 @@ run_step__101_v1() {
             if [ -n "$ccdc_saved_int" ]; then eval "$ccdc_saved_int"; else trap - INT; fi
             __status=$?
             if [ "${__status}" != 0 ]; then
-                ret_run_step101_v1=''
+                ret_run_step102_v1=''
                 return "${__status}"
             fi
-            ret_run_step101_v1=''
+            ret_run_step102_v1=''
             return "${result_819}"
         fi
         local skip_827="${ret_fw_yesno46_v0}"
         if [ -n "$ccdc_saved_int" ]; then eval "$ccdc_saved_int"; else trap - INT; fi
         __status=$?
         if [ "${__status}" != 0 ]; then
-            ret_run_step101_v1=''
+            ret_run_step102_v1=''
             return "${__status}"
         fi
         if [ "$(( ! skip_827 ))" != 0 ]; then
-            ret_run_step101_v1=''
+            ret_run_step102_v1=''
             return "${result_819}"
         fi
         echo "Skipped ${module_name_817} after failure (exit ${result_819})."
@@ -1021,7 +1021,7 @@ run_step__101_v1() {
 }
 
 # splunk_address()
-splunk_address__102_v0() {
+splunk_address__103_v0() {
     local ccdc_ip_value='' ccdc_saved_int
       ccdc_saved_int=$(trap -p INT)
       ccdc_read_ip() {
@@ -1035,7 +1035,7 @@ splunk_address__102_v0() {
       }
     __status=$?
     if [ "${__status}" != 0 ]; then
-        ret_splunk_address102_v0=''
+        ret_splunk_address103_v0=''
         return "${__status}"
     fi
     while :
@@ -1051,29 +1051,29 @@ splunk_address__102_v0() {
             unset -f ccdc_read_ip
             __status=$?
             if [ "${__status}" != 0 ]; then
-                ret_splunk_address102_v0=''
+                ret_splunk_address103_v0=''
                 return "${__status}"
             fi
             echo "Skipped splunk after Ctrl+C."
-            ret_splunk_address102_v0=""
+            ret_splunk_address103_v0=""
             return 0
         fi
         if [ "$(( result_1001 != 0 ))" != 0 ]; then
             unset -f ccdc_read_ip
             __status=$?
             if [ "${__status}" != 0 ]; then
-                ret_splunk_address102_v0=''
+                ret_splunk_address103_v0=''
                 return "${__status}"
             fi
             echo "Aborted: no Splunk address was provided (EOF)."
-            ret_splunk_address102_v0=''
+            ret_splunk_address103_v0=''
             return 1
         fi
         local command_42
         command_42="$(printf '%s' "$ccdc_ip_value")"
         __status=$?
         if [ "${__status}" != 0 ]; then
-            ret_splunk_address102_v0=''
+            ret_splunk_address103_v0=''
             return "${__status}"
         fi
         trim__10_v0 "${command_42}"
@@ -1086,10 +1086,10 @@ splunk_address__102_v0() {
             unset -f ccdc_read_ip
             __status=$?
             if [ "${__status}" != 0 ]; then
-                ret_splunk_address102_v0=''
+                ret_splunk_address103_v0=''
                 return "${__status}"
             fi
-            ret_splunk_address102_v0="${address_1003}"
+            ret_splunk_address103_v0="${address_1003}"
             return 0
         fi
         echo "Enter one IPv4 address with decimal octets 0-255, without leading zeros or a subnet prefix."
@@ -1108,33 +1108,33 @@ if [ "$([ "_${uid_11}" == "_0" ]; echo $?)" != 0 ]; then
 fi
 array_47=("zulu" "fastfw" "splunk")
 for module_name_12 in "${array_47[@]}"; do
-    import_module__96_v0 "${module_name_12}"
+    import_module__97_v0 "${module_name_12}"
     __status=$?
     if [ "${__status}" != 0 ]; then
         exit "${__status}"
     fi
 done
 array_48=("-i")
-run_step__101_v0 "zulu" array_48[@]
+run_step__102_v0 "zulu" array_48[@]
 __status=$?
 if [ "${__status}" != 0 ]; then
     exit "${__status}"
 fi
 array_49=()
-run_step__101_v1 "fastfw" array_49[@]
+run_step__102_v1 "fastfw" array_49[@]
 __status=$?
 if [ "${__status}" != 0 ]; then
     exit "${__status}"
 fi
-splunk_address__102_v0 
+splunk_address__103_v0 
 __status=$?
 if [ "${__status}" != 0 ]; then
     exit "${__status}"
 fi
-ip_1021="${ret_splunk_address102_v0}"
+ip_1021="${ret_splunk_address103_v0}"
 if [ "$([ "_${ip_1021}" == "_" ]; echo $?)" != 0 ]; then
     array_50=("-f" "${ip_1021}")
-    run_step__101_v0 "splunk" array_50[@]
+    run_step__102_v0 "splunk" array_50[@]
     __status=$?
     if [ "${__status}" != 0 ]; then
         exit "${__status}"
