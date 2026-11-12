@@ -978,13 +978,8 @@ __status=$?
 if [ "${__status}" != 0 ]; then
     exit "${__status}"
 fi
-<<<<<<< HEAD
-ret_fw_yesno47_v0__119_8="${ret_fw_yesno47_v0}"
-if [ "${ret_fw_yesno47_v0__119_8}" != 0 ]; then
-=======
 ret_fw_yesno47_v0__113_8="${ret_fw_yesno47_v0}"
 if [ "${ret_fw_yesno47_v0__113_8}" != 0 ]; then
->>>>>>> 1c026e5 (Updates to the fastfw and initial-hardening modules)
     fw_port_rule__53_v0 "INPUT" "tcp" "22" "" "SSH"
     __status=$?
     if [ "${__status}" != 0 ]; then
@@ -1009,13 +1004,8 @@ __status=$?
 if [ "${__status}" != 0 ]; then
     exit "${__status}"
 fi
-<<<<<<< HEAD
-ret_fw_yesno47_v0__129_8="${ret_fw_yesno47_v0}"
-if [ "${ret_fw_yesno47_v0__129_8}" != 0 ]; then
-=======
 ret_fw_yesno47_v0__123_8="${ret_fw_yesno47_v0}"
 if [ "${ret_fw_yesno47_v0__123_8}" != 0 ]; then
->>>>>>> 1c026e5 (Updates to the fastfw and initial-hardening modules)
     fw_addresses__49_v0 "Space-separated domain controller IPv4 addresses (blank uses DNS servers):" 0
     __status=$?
     if [ "${__status}" != 0 ]; then
@@ -1026,13 +1016,8 @@ if [ "${ret_fw_yesno47_v0__123_8}" != 0 ]; then
     if [ "$(( ${#__length_57[@]} == 0 ))" != 0 ]; then
         controllers_306=("${dns_286[@]}")
     fi
-<<<<<<< HEAD
-    __length_54=("${controllers_281[@]}")
-    if [ "$(( ${#__length_54[@]} == 0 ))" != 0 ]; then
-=======
     __length_58=("${controllers_306[@]}")
     if [ "$(( ${#__length_58[@]} == 0 ))" != 0 ]; then
->>>>>>> 1c026e5 (Updates to the fastfw and initial-hardening modules)
         fw_addresses__49_v0 "Space-separated domain controller IPv4 addresses (at least one required):" 1
         __status=$?
         if [ "${__status}" != 0 ]; then
@@ -1040,32 +1025,18 @@ if [ "${ret_fw_yesno47_v0__123_8}" != 0 ]; then
         fi
         controllers_306=("${ret_fw_addresses49_v0[@]}")
     fi
-<<<<<<< HEAD
-    for address_282 in "${controllers_281[@]}"; do
-        fw_port_rule__53_v0 "OUTPUT" "udp" "123" "${address_282}" "NTP"
-=======
     for address_307 in "${controllers_306[@]}"; do
         fw_port_rule__53_v0 "OUTPUT" "udp" "123" "${address_307}" "NTP"
->>>>>>> 1c026e5 (Updates to the fastfw and initial-hardening modules)
         __status=$?
         if [ "${__status}" != 0 ]; then
             exit "${__status}"
         fi
-<<<<<<< HEAD
-        rules_81+="${ret_fw_port_rule53_v0}"
-        array_59=("tcp" "udp")
-        for proto_283 in "${array_59[@]}"; do
-            array_62=("88" "389")
-            for port_284 in "${array_62[@]}"; do
-                fw_port_rule__53_v0 "OUTPUT" "${proto_283}" "${port_284}" "${address_282}" "AD"
-=======
         rules_106+="${ret_fw_port_rule53_v0}"
         array_63=("tcp" "udp")
         for proto_308 in "${array_63[@]}"; do
             array_66=("88" "389")
             for port_309 in "${array_66[@]}"; do
                 fw_port_rule__53_v0 "OUTPUT" "${proto_308}" "${port_309}" "${address_307}" "AD"
->>>>>>> 1c026e5 (Updates to the fastfw and initial-hardening modules)
                 __status=$?
                 if [ "${__status}" != 0 ]; then
                     exit "${__status}"
@@ -1086,27 +1057,13 @@ __status=$?
 if [ "${__status}" != 0 ]; then
     exit "${__status}"
 fi
-<<<<<<< HEAD
-ret_fw_yesno47_v0__145_8="${ret_fw_yesno47_v0}"
-if [ "${ret_fw_yesno47_v0__145_8}" != 0 ]; then
-=======
 ret_fw_yesno47_v0__139_8="${ret_fw_yesno47_v0}"
 if [ "${ret_fw_yesno47_v0__139_8}" != 0 ]; then
->>>>>>> 1c026e5 (Updates to the fastfw and initial-hardening modules)
     fw_addresses__49_v0 "Space-separated IPv4 addresses/subnets:" 1
     __status=$?
     if [ "${__status}" != 0 ]; then
         exit "${__status}"
     fi
-<<<<<<< HEAD
-    ret_fw_addresses49_v0__146_24=("${ret_fw_addresses49_v0[@]}")
-    for address_286 in "${ret_fw_addresses49_v0__146_24[@]}"; do
-        array_70=("INPUT" "OUTPUT")
-        for chain_287 in "${array_70[@]}"; do
-            array_73=("tcp" "udp")
-            for proto_288 in "${array_73[@]}"; do
-                fw_ports__54_v0 "${chain_287}" "${proto_288}" "${address_286}"
-=======
     ret_fw_addresses49_v0__140_24=("${ret_fw_addresses49_v0[@]}")
     for address_310 in "${ret_fw_addresses49_v0__140_24[@]}"; do
         array_71=("INPUT" "OUTPUT")
@@ -1114,7 +1071,6 @@ if [ "${ret_fw_yesno47_v0__139_8}" != 0 ]; then
             array_74=("tcp" "udp")
             for proto_312 in "${array_74[@]}"; do
                 fw_ports__54_v0 "${chain_311}" "${proto_312}" "${address_310}"
->>>>>>> 1c026e5 (Updates to the fastfw and initial-hardening modules)
                 __status=$?
                 if [ "${__status}" != 0 ]; then
                     exit "${__status}"
