@@ -1103,13 +1103,20 @@ code_316="${__status}"
     fi
     exit "${code_316}"
 fi
+sysctl -w "kernel.printk=3 3 3 3"
+__status=$?
+if [ "${__status}" != 0 ]; then
+code_317="${__status}"
+    echo "IPv4 firewall was applied, but setting kernel.printk failed."
+    exit "${code_317}"
+fi
 if [ "$(( result_315 == 0 ))" != 0 ]; then
     echo "Rules validated. After the rules are applied, verify that SSH and required services still work, then press y and Enter within 30 seconds to keep them. If anything broke, do not confirm; the previous rules will be restored."
     iptables-apply -t 30 "${path_314}"
     __status=$?
     if [ "${__status}" != 0 ]; then
-    code_317="${__status}"
-        result_315="${code_317}"
+    code_318="${__status}"
+        result_315="${code_318}"
     fi
 fi
 rm -f -- "${path_314}"
@@ -1120,13 +1127,6 @@ fi
 if [ "$(( result_315 != 0 ))" != 0 ]; then
     echo "Firewall changes were not confirmed or could not be applied."
     exit "${result_315}"
-fi
-sysctl -w "kernel.printk=3 3 3 3"
-__status=$?
-if [ "${__status}" != 0 ]; then
-code_318="${__status}"
-    echo "IPv4 firewall was applied, but setting kernel.printk failed."
-    exit "${code_318}"
 fi
 command_76="$(command -v iptables-restore)"
 __status=$?
